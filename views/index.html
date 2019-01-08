@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>FaceAPI example</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="/js/face-api.js"></script>
+    <script src="/js/main.js"></script>
+    <!-- <script src="/js/faceDetectionControls.js"></script> -->
+    <script src="/js/drawing.js"></script>
+    <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/css/materialize.css">
+  <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.100.2/js/materialize.min.js"></script>
+
+  </head>
+  <body>
+
+      <div class="center-content page-container">
+
+        <div class="progress" id="loader">
+          <div class="indeterminate"></div>
+        </div>
+        <div style="position: relative" class="margin">
+          <video onplay="onPlay(this)" id="inputVideo" autoplay muted></video>
+          <canvas id="overlay" />
+        </div>
+    </div>
+  </body>
+</html>
