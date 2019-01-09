@@ -12,3 +12,15 @@ npm start
 Browse to http://localhost:3000/.
 
 This example is modified to only use the Tiny Face Detector and the webcam directly. All other non-related code has been reduced and removed. For the full examples, visit the face-api.js library itself.
+
+### Using Face Detection
+
+In order for face detection to work you will need to create at least 1 reference object.
+
+Inside the images folder:
+1) create a folder with the reference name (e.g. john):
+2) Inside the folder, add 3 images with these names (john1.jpeg, john2.jpeg, john3.jpeg). Please note the use of the extension (jpeg, and the numbers 1, 2, 3). This was a quick example so few of these things are hardcoded but you can edit all of these in the file main.js
+
+Example output image:
+
+![screenshot output on browser](exampleOutputBrowser.png)
