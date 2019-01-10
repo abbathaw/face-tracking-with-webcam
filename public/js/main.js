@@ -2,10 +2,10 @@ let forwardTimes = [];
 let withBoxes = false;
 let faceMatcher = null;
 const MODEL_URL = "/models";
-const INPUT_SIZE_WEBCAM = 320; //common sizes are 128, 160, 224, 320, 416, 512, 608,
-const INPUT_SIZE_IMAGE = 320;
-const threshold = 0.5;
-const DISTANCE_THRESHOLD = 0.45;
+const INPUT_SIZE_WEBCAM = 608; //common sizes are 128, 160, 224, 320, 416, 512, 608,
+const INPUT_SIZE_IMAGE = 224;
+const threshold = 0.7;
+const DISTANCE_THRESHOLD = 0.5;
 const maxAvailableImagesPerClass = 3;
 let withEmotions = false;
 
@@ -24,9 +24,7 @@ async function loadModels() {
 loadModels().then(async () => {
   console.log("Loaded Models");
   changeInputSize(INPUT_SIZE_WEBCAM);
-  // const stream = await navigator.mediaDevices.getUserMedia({ video: {} });
   const videoEl = $("#inputVideo").get(0);
-  // onPlay($('#inputVideo').get(0));
   
   // initialize face matcher with 3 reference descriptor per person
   faceMatcher = await createFaceMatcherFromMultiplePhotos(3);
@@ -53,7 +51,7 @@ async function onPlay(videoEl) {
   if (withEmotions) {
     const result = await faceapi
     .detectAllFaces(videoEl, options)
-        .withFaceExpressions();
+    .withFaceExpressions();
     updateTimeStats(Date.now() - ts);
     if (result) {
       drawExpressions(videoEl, canvas, result, withBoxes);
@@ -70,6 +68,8 @@ async function onPlay(videoEl) {
       drawLandmarks(videoEl, canvas, result, withBoxes);
       updateFaceMatcherResults(result);
     } else {
+      const context = canvas.getContext('2d');
+      context.clearRect(0, 0, canvas.width, canvas.height);
       console.log("NO FACE");
     }
     setTimeout(() => onPlay(videoEl));
@@ -79,7 +79,7 @@ async function onPlay(videoEl) {
 // FACE DETECTION
 
 //Array of available persons with reference images
-const classes = ["abdullah", "kangleng", "leon", "masoud", "faiz", "faris", "kornesh", "khailoon", "kaiming"];
+const classes = ["abdullah", "kangleng", "leon", "masoud", "faiz", "faris", "kornesh", "khailoon", "kaiming", "amir", "zed"];
 
 function getFaceImageUri(className, idx) {
   return `${className}/${className}${idx}.jpeg`
@@ -119,8 +119,7 @@ async function createFaceMatcherFromMultiplePhotos(numImagesForTraining = 1) {
         )
       }
   ));
-  const distanceThreshold = DISTANCE_THRESHOLD;
-  return new faceapi.FaceMatcher(labeledFaceDescriptors, distanceThreshold);
+  return new faceapi.FaceMatcher(labeledFaceDescriptors, DISTANCE_THRESHOLD);
 }
 
 function updateFaceMatcherResults(srcFromWebcam) {

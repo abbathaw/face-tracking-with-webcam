@@ -1069,11 +1069,11 @@
         if (options === void 0) { options = {}; }
         return Object.assign({}, {
             boxColor: 'blue',
-            textColor: 'red',
+            textColor: 'white',
             lineWidth: 2,
-            fontSize: 20,
+            fontSize: 33,
             fontStyle: 'Georgia',
-            withScore: true,
+            withScore: false,
             withClassName: true
         }, options);
     }
