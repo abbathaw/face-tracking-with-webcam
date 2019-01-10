@@ -7,6 +7,11 @@ const INPUT_SIZE_IMAGE = 224;
 const threshold = 0.5;
 const DISTANCE_THRESHOLD = 0.45;
 const maxAvailableImagesPerClass = 3;
+let withEmotions = false;
+
+function onChangeWithFaceEmotions(e) {
+  withEmotions = $(e.target).prop('checked');
+}
 
 async function loadModels() {
   await faceapi.loadTinyFaceDetectorModel(MODEL_URL);
@@ -45,19 +50,31 @@ async function onPlay() {
 
   const canvas = $("#overlay").get(0);
   const ts = Date.now();
-  const result = await faceapi
+  if (withEmotions) {
+    const result = await faceapi
     .detectAllFaces(videoEl, options)
+        .withFaceExpressions();
+    updateTimeStats(Date.now() - ts);
+    if (result) {
+      drawExpressions(videoEl, canvas, result, withBoxes);
+    } else {
+      console.log("NO FACE");
+    }
+    setTimeout(() => onPlay());
+  } else {
+    const result = await faceapi.detectAllFaces(videoEl, options)
     .withFaceLandmarks()
     .withFaceDescriptors();
-  updateTimeStats(Date.now() - ts);
-  if (result) {
-    drawLandmarks(videoEl, canvas, result, withBoxes);
-    updateFaceMatcherResults(result);
-  } else {
-    console.log("NO FACE");
+    updateTimeStats(Date.now() - ts);
+    if ( result ) {
+      drawLandmarks(videoEl, canvas, result, withBoxes);
+      updateFaceMatcherResults(result);
+    } else {
+      console.log("NO FACE");
+    }
+    $("#loader").hide();
+    setTimeout(() => onPlay());
   }
-  $("#loader").hide();
-  setTimeout(() => onPlay());
 }
 
 // FACE DETECTION

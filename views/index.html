@@ -26,6 +26,13 @@
           <video onplay="onPlay(this)" id="inputVideo" autoplay muted></video>
           <canvas id="overlay" />
         </div>
-    </div>
+
+      </div>
+      <div>
+        <div class="row" style="width: 220px;">
+          <input type="checkbox" id="withFaceLandmarksCheckbox" onchange="onChangeWithFaceEmotions(event)" />
+          <label for="withFaceLandmarksCheckbox">Detect Emotions</label>
+        </div>
+      </div>
   </body>
 </html>
