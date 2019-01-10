@@ -10,7 +10,7 @@ const viewsDir = path.join(__dirname, "views");
 app.use(express.static(viewsDir));
 app.use(express.static(path.join(__dirname, "./public")));
 app.use(express.static(path.join(__dirname, "./images")));
-app.use(express.static(path.join(__dirname, "../media")));
+app.use(express.static(path.join(__dirname, "./media")));
 
 app.get("/", (req, res) => res.redirect("/index"));
 

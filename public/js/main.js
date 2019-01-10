@@ -2,8 +2,8 @@ let forwardTimes = [];
 let withBoxes = false;
 let faceMatcher = null;
 const MODEL_URL = "/models";
-const INPUT_SIZE_WEBCAM = 224; //common sizes are 128, 160, 224, 320, 416, 512, 608,
-const INPUT_SIZE_IMAGE = 224;
+const INPUT_SIZE_WEBCAM = 320; //common sizes are 128, 160, 224, 320, 416, 512, 608,
+const INPUT_SIZE_IMAGE = 320;
 const threshold = 0.5;
 const DISTANCE_THRESHOLD = 0.45;
 const maxAvailableImagesPerClass = 3;
@@ -24,28 +24,28 @@ async function loadModels() {
 loadModels().then(async () => {
   console.log("Loaded Models");
   changeInputSize(INPUT_SIZE_WEBCAM);
-  const stream = await navigator.mediaDevices.getUserMedia({ video: {} });
+  // const stream = await navigator.mediaDevices.getUserMedia({ video: {} });
   const videoEl = $("#inputVideo").get(0);
+  // onPlay($('#inputVideo').get(0));
   
   // initialize face matcher with 3 reference descriptor per person
   faceMatcher = await createFaceMatcherFromMultiplePhotos(3);
   
-  videoEl.srcObject = stream;
+  // videoEl.srcObject = stream;
+  videoEl.play();
+  $("#loader").hide();
+  onPlay(videoEl)
 });
 
-async function onPlay() {
-  const videoEl = $("#inputVideo").get(0);
-
-  if (videoEl.paused || videoEl.ended || !isFaceDetectionModelLoaded()) {
-    return setTimeout(() => onPlay());
+async function onPlay(videoEl) {
+  if (!videoEl.currentTime|| videoEl.paused || videoEl.ended || !isFaceDetectionModelLoaded()) {
+    return setTimeout(() => onPlay(videoEl));
   }
 
   // tiny_face_detector options
-  let inputSize = INPUT_SIZE_WEBCAM;
-  let scoreThreshold = threshold;
   const options = new faceapi.TinyFaceDetectorOptions({
-    inputSize,
-    scoreThreshold
+    INPUT_SIZE_WEBCAM,
+    threshold
   });
 
   const canvas = $("#overlay").get(0);
@@ -60,7 +60,7 @@ async function onPlay() {
     } else {
       console.log("NO FACE");
     }
-    setTimeout(() => onPlay());
+    setTimeout(() => onPlay(videoEl));
   } else {
     const result = await faceapi.detectAllFaces(videoEl, options)
     .withFaceLandmarks()
@@ -72,8 +72,7 @@ async function onPlay() {
     } else {
       console.log("NO FACE");
     }
-    $("#loader").hide();
-    setTimeout(() => onPlay());
+    setTimeout(() => onPlay(videoEl));
   }
 }
 
@@ -81,7 +80,6 @@ async function onPlay() {
 
 //Array of available persons with reference images
 const classes = ["abdullah", "kangleng", "leon", "masoud", "faiz", "faris", "kornesh", "khailoon", "kaiming"];
-// const classes = ["leon", "kaiming"];
 
 function getFaceImageUri(className, idx) {
   return `${className}/${className}${idx}.jpeg`

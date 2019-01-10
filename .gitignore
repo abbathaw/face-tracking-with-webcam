@@ -2,3 +2,5 @@ node_modules
 images/*
 !images/.gitkeep
 .idea/
+media/*
+!media/.gitkeep

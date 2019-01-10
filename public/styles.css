@@ -70,12 +70,12 @@
   position: absolute;
   top: 0;
   left: 0;
-  width: 1080px;
+  /*width: 1080px;*/
 }
 
-#inputVideo {
-  width: 1080px;
-}
+/*#inputVideo {*/
+  /*width: 1080px;*/
+/*}*/
 
 #facesContainer canvas {
   margin: 10px;
