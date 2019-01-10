@@ -2,6 +2,12 @@ let forwardTimes = [];
 let withBoxes = false;
 let faceMatcher = null;
 const MODEL_URL = "/models";
+const INPUT_SIZE_WEBCAM = 224; //common sizes are 128, 160, 224, 320, 416, 512, 608,
+const INPUT_SIZE_IMAGE = 224;
+const threshold = 0.5;
+const DISTANCE_THRESHOLD = 0.45;
+const maxAvailableImagesPerClass = 3;
+
 async function loadModels() {
   await faceapi.loadTinyFaceDetectorModel(MODEL_URL);
   await faceapi.loadFaceLandmarkTinyModel(MODEL_URL);
@@ -12,7 +18,7 @@ async function loadModels() {
 
 loadModels().then(async () => {
   console.log("Loaded Models");
-  changeInputSize(416);
+  changeInputSize(INPUT_SIZE_WEBCAM);
   const stream = await navigator.mediaDevices.getUserMedia({ video: {} });
   const videoEl = $("#inputVideo").get(0);
   
@@ -30,8 +36,8 @@ async function onPlay() {
   }
 
   // tiny_face_detector options
-  let inputSize = 416;
-  let scoreThreshold = 0.7;
+  let inputSize = INPUT_SIZE_WEBCAM;
+  let scoreThreshold = threshold;
   const options = new faceapi.TinyFaceDetectorOptions({
     inputSize,
     scoreThreshold
@@ -40,12 +46,12 @@ async function onPlay() {
   const canvas = $("#overlay").get(0);
   const ts = Date.now();
   const result = await faceapi
-    .detectSingleFace(videoEl, options)
+    .detectAllFaces(videoEl, options)
     .withFaceLandmarks()
-    .withFaceDescriptor();
+    .withFaceDescriptors();
   updateTimeStats(Date.now() - ts);
   if (result) {
-    drawLandmarks(videoEl, canvas, [result], withBoxes);
+    drawLandmarks(videoEl, canvas, result, withBoxes);
     updateFaceMatcherResults(result);
   } else {
     console.log("NO FACE");
@@ -57,19 +63,20 @@ async function onPlay() {
 // FACE DETECTION
 
 //Array of available persons with reference images
-const classes = ["abdullah", "kangleng"];
+const classes = ["abdullah", "kangleng", "leon", "masoud", "faiz", "faris", "kornesh", "khailoon", "kaiming"];
+// const classes = ["leon", "kaiming"];
 
 function getFaceImageUri(className, idx) {
   return `${className}/${className}${idx}.jpeg`
 }
 
 async function createFaceMatcherFromMultiplePhotos(numImagesForTraining = 1) {
-  const maxAvailableImagesPerClass = 2;
+  
   numImagesForTraining = Math.min(numImagesForTraining, maxAvailableImagesPerClass);
   
     // tiny_face_detector options
-  let inputSize = 224;
-  let scoreThreshold = 0.5;
+  let inputSize = INPUT_SIZE_IMAGE;
+  let scoreThreshold = threshold;
   const options = new faceapi.TinyFaceDetectorOptions({
     inputSize,
     scoreThreshold
@@ -84,7 +91,11 @@ async function createFaceMatcherFromMultiplePhotos(numImagesForTraining = 1) {
           .detectSingleFace(img, options)
           .withFaceLandmarks()
           .withFaceDescriptor();
-          descriptors.push(fullFaceDescription.descriptor)
+          if (fullFaceDescription) {
+            descriptors.push(fullFaceDescription.descriptor)
+          } else {
+            console.log("imageundefined", className + i);
+          }
         }
         
         return new faceapi.LabeledFaceDescriptors(
@@ -93,7 +104,7 @@ async function createFaceMatcherFromMultiplePhotos(numImagesForTraining = 1) {
         )
       }
   ));
-  const distanceThreshold = 0.45;
+  const distanceThreshold = DISTANCE_THRESHOLD;
   return new faceapi.FaceMatcher(labeledFaceDescriptors, distanceThreshold);
 }
 
@@ -103,7 +114,7 @@ function updateFaceMatcherResults(srcFromWebcam) {
 
 function drawFaceRecognitionResults(srcFromWebcam) {
   const canvas = $('#overlay').get(0);
-  const fullFaceDescriptions = [srcFromWebcam];
+  const fullFaceDescriptions = srcFromWebcam;
   const boxesWithText = fullFaceDescriptions.map(({ detection, descriptor }) => {
     const text = faceMatcher.findBestMatch(descriptor).toString();
     return new faceapi.BoxWithText(
