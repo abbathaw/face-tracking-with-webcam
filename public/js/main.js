@@ -17,7 +17,7 @@ loadModels().then(async () => {
   const videoEl = $("#inputVideo").get(0);
   
   // initialize face matcher with 3 reference descriptor per person
-  faceMatcher = await createFaceMatcherFromMultiplePhotos(3);
+  faceMatcher = await createFaceMatcherFromMultiplePhotos(2);
   
   videoEl.srcObject = stream;
 });
@@ -57,7 +57,7 @@ async function onPlay() {
 // FACE DETECTION
 
 //Array of available persons with reference images
-const classes = ["abdullah", "kangleng"];
+const classes = ["abdullah"];
 
 function getFaceImageUri(className, idx) {
   return `${className}/${className}${idx}.jpeg`
